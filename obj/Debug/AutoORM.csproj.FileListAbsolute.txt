@@ -1,6 +1,0 @@
-E:\其他\AutoORM\AutoORM\AutoORM\bin\Debug\AutoORM.dll
-E:\其他\AutoORM\AutoORM\AutoORM\bin\Debug\AutoORM.pdb
-E:\其他\AutoORM\AutoORM\AutoORM\obj\Debug\AutoORM.dll
-E:\其他\AutoORM\AutoORM\AutoORM\obj\Debug\AutoORM.pdb
-E:\其他\AutoORM\AutoORM\AutoORM\bin\Debug\AutoORM.dll.config
-E:\其他\AutoORM\AutoORM\AutoORM\bin\Debug\MySql.Data.dll

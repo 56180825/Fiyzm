@@ -1,3 +1,0 @@
-e:\其他\AutoORM\AutoORM\AutoORMCore\obj\Release\netstandard2.0\AutoORM.csproj.CoreCompileInputs.cache
-e:\其他\AutoORM\AutoORM\AutoORMCore\obj\Release\netstandard2.0\AutoORM.AssemblyInfoInputs.cache
-e:\其他\AutoORM\AutoORM\AutoORMCore\obj\Release\netstandard2.0\AutoORM.AssemblyInfo.cs

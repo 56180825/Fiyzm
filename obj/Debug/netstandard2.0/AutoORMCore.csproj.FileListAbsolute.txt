@@ -1,9 +1,0 @@
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.csproj.CoreCompileInputs.cache
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.AssemblyInfoInputs.cache
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.AssemblyInfo.cs
-E:\其他\AutoORM\AutoORM\AutoORMCore\bin\Debug\netstandard2.0\AutoORMCore.deps.json
-E:\其他\AutoORM\AutoORM\AutoORMCore\bin\Debug\netstandard2.0\AutoORMCore.dll
-E:\其他\AutoORM\AutoORM\AutoORMCore\bin\Debug\netstandard2.0\AutoORMCore.pdb
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.dll
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.pdb
-E:\其他\AutoORM\AutoORM\AutoORMCore\obj\Debug\netstandard2.0\AutoORMCore.csprojAssemblyReference.cache
