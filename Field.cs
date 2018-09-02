@@ -34,5 +34,6 @@ namespace AutoORMCore
         internal Column Column { get; set; }
         internal MethodInfo GetMethod { get; set; }
         internal MethodInfo SetMethod { get; set; }
+        internal Type PropertyType { get; set; }
     }
 }
