@@ -16,13 +16,16 @@ namespace AutoORMCore.DbExpress
         {
             dic = new ConcurrentDictionary<string, object>();
         }
-        internal static object Convert(object obj, Type t)
+        internal static object Convert(object obj, Type t,bool isGenericType)
         {
             if (obj == DBNull.Value || obj == null)
             {
-                return t.IsValueType ? Activator.CreateInstance(t) : null;
+                //if (isGenericType) { return null; }
+                if (t.IsValueType&&!isGenericType) { return Activator.CreateInstance(t); }
+                return null;
             }
             if (t == typeof(string)) { return obj.ToString(); }
+            //if (t.IsGenericType) { t = t.GenericTypeArguments[0]; }
             if (t.Equals(typeof(Guid)))
             {
                 return Guid.Parse(obj.ToString());
@@ -33,7 +36,7 @@ namespace AutoORMCore.DbExpress
             }
             return System.Convert.ChangeType(obj, t);
         }
-        internal static Func<IDataReader, Dictionary<string, int>, T> CreateBind<T>() where T:new()
+        internal static Temp<T> CreateBind<T>() where T:new()
         {
             //产生如下代码
             //var t = new T();
@@ -44,9 +47,10 @@ namespace AutoORMCore.DbExpress
             //}
             var type = typeof(T);
             var fields = DelegateExpr.GetFieldInfo<T>();
+            var dic1 = new Dictionary<string, int>(fields.Count);
             object obj = null;
-            if (dic.TryGetValue(type.FullName, out obj)) { return obj as Func<IDataReader, Dictionary<string, int>, T>; }
-            var d = new DynamicMethod("FUNC_"+Guid.NewGuid().ToString(), type, new Type[2] { typeof(System.Data.IDataReader), typeof(Dictionary<string, int>) });
+            if (dic.TryGetValue(type.FullName, out obj)) { return obj as Temp<T>; }
+            var d = new DynamicMethod("FUNC_"+Guid.NewGuid().ToString(), type, new Type[2] { typeof(System.Data.IDataReader), typeof(int[]) });
             var g = d.GetILGenerator();
             var r1 = g.DeclareLocal(type);//局部变量必须定义，不然会报错
             var r2 = g.DeclareLocal(typeof(int));
@@ -58,11 +62,11 @@ namespace AutoORMCore.DbExpress
             g.Emit(OpCodes.Stloc_0);
             g.Emit(OpCodes.Ldc_I4_0);
             g.Emit(OpCodes.Stloc_1);
-            Func<Object, Type, Object> cg =Emit.Convert;
+            Func<Object, Type, bool, Object> cg = Emit.Convert;
             var GetTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.Static);//获取类型
             var TryGetValue = typeof(Dictionary<string, int>).GetMethod("TryGetValue");
             var Item = typeof(System.Data.IDataRecord).GetMethod("get_Item", new Type[1] { typeof(int) });
-            var lt = new List<string>(2);
+            var lt = new List<string>(2); int x = 0;
             foreach (var n in fields.Values)
             {
                 if (n.IsExcludeColumn || n.IsExcludeDelegate || n.SetMethod == null) { continue; }
@@ -72,32 +76,43 @@ namespace AutoORMCore.DbExpress
                 var tp = n.FieldType;
                 foreach (var a in lt)
                 {
-                    var name = a;
                     var dl = g.DefineLabel();
                     g.Emit(OpCodes.Ldarg_1);
-                    g.Emit(OpCodes.Ldstr, name);
-                    g.Emit(OpCodes.Ldloca_S, 1);
-                    g.Emit(OpCodes.Callvirt, TryGetValue);
-                    g.Emit(OpCodes.Brfalse_S, dl);
+                    g.Emit(OpCodes.Ldc_I4, x);
+                    g.Emit(OpCodes.Ldelem_I4);
+                    g.Emit(OpCodes.Ldc_I4_M1);
+                    g.Emit(OpCodes.Ble_S, dl);
 
                     g.Emit(OpCodes.Ldloc_0);
                     g.Emit(OpCodes.Ldarg_0);
-                    g.Emit(OpCodes.Ldloc_1);
+                    g.Emit(OpCodes.Ldarg_1);
+                    g.Emit(OpCodes.Ldc_I4, x);
+                    g.Emit(OpCodes.Ldelem_I4);
                     g.Emit(OpCodes.Callvirt, Item);
 
-                    g.Emit(OpCodes.Ldtoken, tp);
+                    g.Emit(OpCodes.Ldtoken, n.FieldType);
                     g.Emit(OpCodes.Call, GetTypeFromHandle);
+                    g.Emit(n.PropertyType.IsGenericType ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
                     g.Emit(OpCodes.Call, cg.Method);
-                    g.Emit(OpCodes.Unbox_Any, tp);
+                    g.Emit(OpCodes.Unbox_Any, n.PropertyType);
                     g.Emit(OpCodes.Callvirt, n.SetMethod);
                     g.MarkLabel(dl);
+                    dic1.Add(a, x);
+                    x++;
                 }
             }
             g.Emit(OpCodes.Ldloc_0);
             g.Emit(OpCodes.Ret);
-            var f = d.CreateDelegate(typeof(Func<IDataReader, Dictionary<string, int>, T>)) as Func<IDataReader, Dictionary<string, int>, T>;
-            dic.TryAdd(type.FullName, f);
-            return f;
+            var tp1 = new Temp<T>();
+            tp1.Func= d.CreateDelegate(typeof(Func<IDataReader, int[], T>)) as Func<IDataReader, int[], T>;
+            tp1.Dic = dic1;
+            dic.TryAdd(type.FullName, tp1);
+            return tp1;
+        }
+        internal class Temp<T>
+        {
+            internal Func<IDataReader, int[], T> Func { get; set; }
+            internal Dictionary<string, int> Dic { get; set; }
         }
     }
 }

@@ -438,10 +438,14 @@ namespace AutoORMCore
             //var lt1 = ColFds;
             //Field fd = null;string fieldname = null;
             var bind = Emit.CreateBind<T>();
-            var dic = new Dictionary<string, int>(rd.FieldCount);
-            for(var i = 0; i < rd.FieldCount; i++)
+            var arr = new int[bind.Dic.Count]; int x = -1;
+            for (var y = 0; y < arr.Length; y++) { arr[y] = -1; }
+            for (var i = 0; i < rd.FieldCount; i++)
             {
-                dic.Add(rd.GetName(i).ToLowerInvariant(), i);
+                if (bind.Dic.TryGetValue(rd.GetName(i).ToLowerInvariant(), out x))
+                {
+                    arr[x] = i;
+                }
             }
             while (rd.Read())
             {
@@ -453,7 +457,7 @@ namespace AutoORMCore
                 //    fd = lt1.Where(n =>string.Compare(n.ColName,fieldname,true)==0).FirstOrDefault();
                 //    set(m, (fd!=null?fd.Name:fieldname).ToLower(), rd[i]);
                 //}
-                lt.Add(bind(rd,dic));
+                lt.Add(bind.Func(rd,arr));
             }
             return lt;
         }

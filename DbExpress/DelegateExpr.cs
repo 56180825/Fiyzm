@@ -136,7 +136,8 @@ namespace AutoORMCore.DbExpress
                         IsExcludeColumn = n.GetCustomAttributes(typeof(DbAttributes.ExcludeColumn), false).Length > 0,
                         Column = arr.Length > 0 ? (DbAttributes.Column)arr[0] : null,
                         GetMethod = n.GetMethod,
-                        SetMethod = n.SetMethod
+                        SetMethod = n.SetMethod,
+                        PropertyType = n.PropertyType
                     });
                 }
                 fList.TryAdd(typeof(T).FullName, list);
